@@ -1,3 +1,15 @@
+
+Open First
+https://docs.google.com/document/d/1-i-eqx3qLrDinvXDK4HjpsopklbDuMHz1a2-UI3U23g/edit?usp=sharing
+
+
+
+
+
+
+
+
+
 <p align="center">
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>

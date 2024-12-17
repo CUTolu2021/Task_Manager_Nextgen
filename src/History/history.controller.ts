@@ -21,11 +21,13 @@ export class HistoryController {
 
     @Get()
     getAllHistory(): any{
+        return this.historyService.getAllHistory();
 
     }
 
     @Get(':id')
-    getAnHistory(@Param('id')historyId: string): any{
+    getASingleHistory(@Param('id')historyId: string): any{
+        return this.historyService.getASingleHistory(historyId);
 
     }
 

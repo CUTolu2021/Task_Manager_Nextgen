@@ -1,4 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+} from '@nestjs/common';
 import { OrganisationService } from './organisation.service';
 import { CreateOrganisationDto } from './dto/create-organisation.dto';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
@@ -14,16 +22,20 @@ export class OrganisationController {
 
   @Get()
   findAll() {
-    return this.organisationService.findAll('organisations');
+    //return this.organisationService.findAll('organisations');
+    return this.organisationService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.organisationService.findOne(+id);
+    return this.organisationService.findOneById(+id);
   }
 
   @Patch(':id')
-  update(@Param('id') id: string, @Body() updateOrganisationDto: UpdateOrganisationDto) {
+  update(
+    @Param('id') id: string,
+    @Body() updateOrganisationDto: UpdateOrganisationDto,
+  ) {
     return this.organisationService.update(+id, updateOrganisationDto);
   }
 
@@ -32,4 +44,3 @@ export class OrganisationController {
     return this.organisationService.remove(+id);
   }
 }
-

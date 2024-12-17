@@ -6,12 +6,9 @@ import { DatabaseModule } from '../database/database.module';
 import { OrganisationController } from './organisation.controller';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Organisation]),
-    DatabaseModule,
-  ],
-  providers: [OrganisationService]
-  , controllers: [ OrganisationController],
+  imports: [TypeOrmModule.forFeature([Organisation]), DatabaseModule],
+  providers: [OrganisationService],
+  controllers: [OrganisationController],
   exports: [OrganisationService],
 })
 export class OrganisationModule {}

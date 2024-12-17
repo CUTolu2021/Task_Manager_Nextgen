@@ -4,14 +4,23 @@ import { DatabaseService } from './database.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
-  imports: [ConfigModule.forRoot(),
+  imports: [
+    ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
+      logging: 'all',
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
+
+      /* host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'gendary6',
+      database: 'task_manager', */
     }),
-  ],  providers: [DatabaseService],
+  ],
+  providers: [DatabaseService],
   exports: [DatabaseService],
 })
 export class DatabaseModule {}

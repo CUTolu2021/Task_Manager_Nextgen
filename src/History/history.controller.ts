@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, Patch, Post } from "@nestjs/common";
 import { HistoryService } from "./history.service";
 
 
@@ -28,6 +28,22 @@ export class HistoryController {
     @Get(':id')
     getASingleHistory(@Param('id')historyId: string): any{
         return this.historyService.getASingleHistory(historyId);
+
+    }
+
+    @Patch(':id')
+    updateHistory(
+        @Param('id')historyId: string, 
+        @Body('createdAt')createdAt: string, @Body('action')action: string, @Body('taskId')taskId: number
+    ){
+        this.historyService.updateProduct(historyId, createdAt, action, taskId);
+        return "successfully updated";
+    }
+
+    @Delete(':id')
+    deleteHistory(@Param('id')historyId: string){
+
+        return this.historyService.deleteHistory(historyId);
 
     }
 

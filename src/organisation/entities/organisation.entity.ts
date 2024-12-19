@@ -1,4 +1,6 @@
-import { Entity, Column, PrimaryGeneratedColumn } from 'typeorm';
+import { Task } from 'src/tasks/entities/task.entity';
+import { User } from 'src/users/entities/user.entity';
+import { Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
 
 @Entity({ name: 'organisations' })
 
@@ -12,6 +14,13 @@ export class Organisation {
     @Column({ unique: true })
     CAC: string;
 
-    @Column()
-    userId: number;
+    @OneToMany(() => Task, (task) => task.organisation)
+    tasks: Task[];  
+
+    @OneToMany(() => User, (user) => user.organisation)
+    users: User[];
+
+    @Column({ default: 'active' })
+    status: string
+    
 }

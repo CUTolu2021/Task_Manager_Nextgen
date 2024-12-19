@@ -1,4 +1,4 @@
-import { Inject, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { CreateOrganisationDto } from './dto/create-organisation.dto';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
 import { Organisation } from './entities/organisation.entity';
@@ -12,23 +12,42 @@ export class OrganisationService {
     private readonly organisationRepository: Repository<Organisation>,
   ) {}
   async create(createOrganisationDto: CreateOrganisationDto) {
-    const organisation = await this.organisationRepository.save(createOrganisationDto);
+    const organisation = await this.organisationRepository.save(
+      createOrganisationDto,
+    );
     return organisation;
   }
 
-  async findAll(name: string): Promise<any[]> {
-    return await this.organisationRepository.query(`SELECT * FROM ${name}`); //`This action returns all organisation`;
+  async findAll(): Promise<any[]> {
+    //return await this.organisationRepository.query(`SELECT * FROM ${name}`); //`This action returns all organisation`;
+    return await this.organisationRepository.find({
+      relations: ['users'],
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} organisation`;
+  findOneById(id: number) {
+    return this.organisationRepository.findOneBy({
+      id,
+    });
+  }
+
+  async findByNameOrCAC(
+    name: string,
+    CAC: string,
+  ): Promise<Organisation | null> {
+    return this.organisationRepository.findOne({
+      where: [{ name }, { CAC }],
+    });
   }
 
   update(id: number, updateOrganisationDto: UpdateOrganisationDto) {
-    return `This action updates a #${id} organisation`;
+    return this.organisationRepository.update(id, updateOrganisationDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} organisation`;
+  async remove(id: number) {
+    const Organisation = await this.organisationRepository.findOneBy({ id });
+    Organisation.status = 'inactive'; 
+    await this.organisationRepository.save(Organisation);
+    return Organisation;
   }
 }

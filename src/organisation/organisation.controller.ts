@@ -14,12 +14,12 @@ export class OrganisationController {
 
   @Get()
   findAll() {
-    return this.organisationService.findAll('organisations');
+    return this.organisationService.findAll();
   }
 
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.organisationService.findOne(+id);
+    return this.organisationService.findOneById(+id);
   }
 
   @Patch(':id')

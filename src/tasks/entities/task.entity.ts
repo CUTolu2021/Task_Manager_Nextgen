@@ -6,15 +6,16 @@ import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, CreateDat
 
 
 export enum taskStatus {
-  LOW= 'LOW',
-  MEDIUM= 'MEDIUM',
-  HIGH='HIGH',
+  NOT_COMPLETED='NOT_COMPLETED',
+    IN_PROGRESS='IN_PROGRESS',
+    COMPLETED='COMPLETED'
+ 
 }
 
 export enum taskPriority {
-    PENDING='PENDING',
-    IN_PROGRESS='IN_PROGRESS',
-    COMPLETED='COMPLETED',
+  LOW= 'LOW',
+  MEDIUM= 'MEDIUM',
+  HIGH='HIGH'
 }
 @Entity({name: "tasks"})
 export class Task {
@@ -27,10 +28,10 @@ export class Task {
     @Column()
     taskDescription: string;
 
-    @Column({ default: taskStatus.LOW })
+    @Column({ default: taskStatus.IN_PROGRESS })
     status: taskStatus;
 
-    @Column({ default: taskPriority.PENDING })
+    @Column({ default: taskPriority.LOW })
     priority: taskPriority;
 
     @OneToMany(() => Comment, (comment) => comment.task)

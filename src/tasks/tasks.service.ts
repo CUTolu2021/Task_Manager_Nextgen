@@ -1,10 +1,12 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
+import { CreateHistoryDto } from 'src/history/dto/create-history.dto';
 import { Not, QueryFailedError, Repository } from 'typeorm';
-import { Task } from './entities/task.entity';
+import { Task, taskStatus } from './entities/task.entity';
 import { UsersService } from 'src/users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
+import { History, HistoryAction } from 'src/history/entities/history.entity';
 import { error } from 'console';
 
 @Injectable()
@@ -12,6 +14,8 @@ export class TasksService {
   constructor(
     @InjectRepository(Task)
     private readonly tasksRepository: Repository<Task>,
+    @InjectRepository(History)
+    private readonly historyRepository: Repository<History>,
     private readonly usersService: UsersService,
   ) {}
   async create(createTaskDto: CreateTaskDto) {
@@ -24,6 +28,12 @@ export class TasksService {
     //check if logged in user organisation is same as the organisation of the user he has assigned a task to
     //if(user.organisation === .assignedBy.id) {
     const task = this.tasksRepository.save(createTaskDto);
+    const createHistoryDto = new CreateHistoryDto();
+    createHistoryDto.action = HistoryAction.CREATED;
+    createHistoryDto.task = { id: (await task).id };
+    createHistoryDto.user = { id: createTaskDto.assignedBy.id }; // this should change to the id of the person that is logged in
+    createHistoryDto.createdAt = new Date();
+    await this.historyRepository.save(createHistoryDto);
     return task;
   }
   catch(error) {
@@ -42,7 +52,7 @@ export class TasksService {
 
   findAll() {
     const tasks = this.tasksRepository.find({
-      relations: ['assignedBy', 'assignedTo'],
+      relations: ['assignedBy', 'assignedTo', 'comments','organisation'],
     })
     return tasks;
   }
@@ -52,18 +62,27 @@ export class TasksService {
       where: { id },
       relations: ['assignedBy', 'assignedTo', 'comments','organisation'],
     });
-    // console.log(task.assignedBy.name); // prints the name of the user who assigned the task
-    // console.log(task.assignedTo.name); // prints the name of the user who was assigned the task
-    return task;
+     return task;
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto) {
     //The people who can update are admin of the organisation, or the user who assigned the task. Think about the personal users too
     const task = await this.tasksRepository.update(id, updateTaskDto);
+    const createHistoryDto = new CreateHistoryDto();
+    if(updateTaskDto.status === taskStatus.COMPLETED) {
+      createHistoryDto.action = HistoryAction.COMPLETED;
+    }
+    else{
+      createHistoryDto.action = HistoryAction.UPDATED;
+    }
+    createHistoryDto.task = { id };
+    createHistoryDto.user = { id: updateTaskDto.assignedBy.id }; // this should change to the id of the person that is logged in
+    createHistoryDto.createdAt = new Date();
+    await this.historyRepository.save(createHistoryDto);
     return task;
   }
 
   remove(id: number) {
-    return `This action removes a #${id} task`;
+    return `This action removes a #${id} task should this be deleted or archived`;
   }
 }

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateCommentDto } from './dto/create-comment.dto';
 import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
@@ -6,6 +6,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
 import { TasksService } from 'src/tasks/tasks.service';
 import { UsersService } from 'src/users/users.service';
+import { GetUser } from 'src/decorator/getUserDecorator';
 
 @Injectable()
 export class CommentsService {
@@ -15,11 +16,23 @@ export class CommentsService {
     private readonly usersService: UsersService,
     private readonly tasksService: TasksService,
   ) {}
-  async create(createCommentDto: CreateCommentDto) {
+  async create(createCommentDto: CreateCommentDto, @GetUser() user: any) {
     try{
-    const comment = await this.commentsRepository.save(createCommentDto);
-    return comment;
+      const loggedInUserId = user.id;
+      const loggedInUser = await this.usersService.findOne(loggedInUserId);
+      const loggedInUserOrganisationId = loggedInUser.organisation?.id
+  
+      const taskCommented = await this.tasksService.findOne(createCommentDto.task.id)
+      if(taskCommented.organisation.id === loggedInUserOrganisationId)
+        {
+          const comment = await this.commentsRepository.save(createCommentDto);
+          return comment;
     }
+    else {
+      throw new HttpException('Task does not exist in your Organisation', HttpStatus.BAD_REQUEST);
+    }
+  }
+
     catch (error) {
       if (error instanceof QueryFailedError) {
         // handle the foreign key violation error

@@ -1,5 +1,5 @@
 import { IsString, IsNotEmpty, IsEnum, IsNumber } from "class-validator";
-import { taskPriority, taskStatus } from "../entities/task.entity";
+import { deleted, taskPriority, taskStatus } from "../entities/task.entity";
 
 export class CreateTaskDto {
 
@@ -17,12 +17,14 @@ export class CreateTaskDto {
    // @IsEnum(taskPriority, {message: "Priority must be either PENDING, IN_PROGRESS or COMPLETED"})
     priority: taskPriority;
 
+    deleted: deleted;
+
     @IsNotEmpty()
     dueDate: Date;
 
     createdAt: Date;
 
-    @IsNotEmpty()
+//is not empty validator was giving me issue for creating task for individual user task creation
     assignedTo: { id: number; name: string;};
     assignedBy: { id: number; name: string;};
 

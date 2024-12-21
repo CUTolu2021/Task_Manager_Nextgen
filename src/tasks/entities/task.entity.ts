@@ -17,6 +17,11 @@ export enum taskPriority {
   MEDIUM= 'MEDIUM',
   HIGH='HIGH'
 }
+export enum deleted {
+  YES= 'YES',
+  NO= 'NO'
+}
+
 @Entity({name: "tasks"})
 export class Task {
     @PrimaryGeneratedColumn()
@@ -30,6 +35,9 @@ export class Task {
 
     @Column({ default: taskStatus.IN_PROGRESS })
     status: taskStatus;
+
+    @Column({ default: deleted.NO})
+    deleted: deleted
 
     @Column({ default: taskPriority.LOW })
     priority: taskPriority;

@@ -19,6 +19,7 @@ export class UsersService {
     const { type, ...userData } = createUserDto;
 
     let organisation: Organisation | null = null;
+    console.log("In side userservice file: ", userData);
 
     if (type === 'organisation' && userData.role === 'admin') {
       if (!userData.organisationName || !userData.organisationCAC) {
@@ -86,8 +87,9 @@ export class UsersService {
   }
 
   async findOne(id: number) {
-    return this.userRepository.findOneBy({
-      id,
+    return this.userRepository.findOne({
+      where:{id},
+      relations:['organisation'],
     });
   }
 

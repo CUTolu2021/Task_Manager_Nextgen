@@ -17,10 +17,10 @@ import { AuthGuard } from 'src/auth/auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @Post()
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.createUser(createUserDto);
-  }
+  // @Post()
+  // create(@Body() createUserDto: CreateUserDto) {
+  //   return this.usersService.createUser(createUserDto);
+  // }
 
   @Get()
   findAll() {

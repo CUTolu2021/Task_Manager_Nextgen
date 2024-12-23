@@ -33,11 +33,9 @@ export class TasksService {
         createTaskDto.assignedBy = { id: user.id, name: loggedInUser.name }
         createTaskDto.assignedTo = { id: user.id, name: loggedInUser.name }
         createTaskDto.organisation = null
-        console.log("This individaul user has been creater")
       }
       else if ((user.type?.toLowerCase() === 'organisation' && user.role?.toLowerCase() === 'admin')) {
         const loggedInUserOrganisationId = loggedInUser.organisation?.id
-        console.log("i am logged in ", loggedInUser)
         const AssignedTo = await this.usersService.findOne(createTaskDto.assignedTo.id)
         const AssignedToOrgId = AssignedTo.organisation?.id
 
@@ -88,8 +86,10 @@ export class TasksService {
       where: {
         organisation: {
           id: loggedInUserOrganisationId,
-        },
-      },
+        }
+         },
+         relations: ['assignedBy', 'assignedTo', 'comments', ],
+     
     });
     return tasks;
   
@@ -107,9 +107,15 @@ export class TasksService {
     return task;
   }
 
-  async update(id: number, updateTaskDto: UpdateTaskDto) {
+  async update(id: number, updateTaskDto: UpdateTaskDto, @GetUser() user: any) {
     //The people who can update are admin of the organisation, or the user who assigned the task. Think about the personal users too
-    const task = await this.tasksRepository.update(id, updateTaskDto);
+    const loggedInUserId = user.id;
+    let Mytask = await this.tasksRepository.findOne({ where: { id } });
+    if (Mytask.assignedTo.id !== loggedInUserId || Mytask.assignedBy.id !== loggedInUserId) {
+      throw new NotFoundException('You are not authorized to update this task');
+    }
+    let task = await this.tasksRepository.update(id, updateTaskDto);
+    
     const createHistoryDto = new CreateHistoryDto();
     if (updateTaskDto.status === taskStatus.COMPLETED) {
       createHistoryDto.action = HistoryAction.COMPLETED;

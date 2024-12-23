@@ -12,27 +12,31 @@ import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { GetUser } from 'src/decorator/getUserDecorator';
 
+@UseGuards(AuthGuard)
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+//Post route is needed for admins to create users
+  @Post()
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.usersService.createUser(createUserDto);
+  }
 
-  // @Post()
-  // create(@Body() createUserDto: CreateUserDto) {
-  //   return this.usersService.createUser(createUserDto);
-  // }
 
   @Get()
-  findAll() {
-    return this.usersService.findAll();
+  //@Roles(Role.Admin)
+  findAll(@GetUser() user: any) {
+    return this.usersService.findUsersByLoggedInAdmin(user);
   }
 
-  @UseGuards(AuthGuard)
-  @Get(':id')
-  //@Roles(Role.Admin)
-  findOne(@Param('id') id: string) {
-    return this.usersService.findOne(+id);
-  }
+  
+  // @Get(':id')
+  // //@Roles(Role.Admin)
+  // findOne(@Param('id') id: string) {
+  //   return this.usersService.findOne(+id);
+  //}
 
   @Patch(':id')
   update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
@@ -46,6 +50,6 @@ export class UsersController {
 
   @Get('/organisation/:id')
   findUsersByOrganisation(@Param('id') id: string) {
-    return this.usersService.findUsersByOrganisationId(+id);
+    return this.usersService.findByOrganisation(+id);
   }
 }

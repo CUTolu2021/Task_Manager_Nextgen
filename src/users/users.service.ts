@@ -6,6 +6,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Organisation } from 'src/organisation/entities/organisation.entity';
 import { OrganisationService } from 'src/organisation/organisation.service';
+import { GetUser } from 'src/decorator/getUserDecorator';
 
 @Injectable()
 export class UsersService {
@@ -19,7 +20,7 @@ export class UsersService {
     const { type, ...userData } = createUserDto;
 
     let organisation: Organisation | null = null;
-    console.log("In side userservice file: ", userData);
+    //console.log("In side userservice file: ", userData);
 
     if (type === 'organisation' && userData.role === 'admin') {
       if (!userData.organisationName || !userData.organisationCAC) {
@@ -80,15 +81,23 @@ export class UsersService {
     return this.userRepository.findOne({ where: { email } });
   }
 
-  async findAll() {
-    return this.userRepository.find({
-      relations: ['organisation'],
+  //Only super admin should be able to find all
+  // async findAll() {
+  //   return this.userRepository.find({
+  //     relations: ['organisation'],
+  //   });
+  // }
+
+  async findOne(id: number) {
+    return await this.userRepository.findOne({
+      where:{id},
+      relations:['organisation'],
     });
   }
 
-  async findOne(id: number) {
-    return this.userRepository.findOne({
-      where:{id},
+  async findByOrganisation(id: number) {
+    return await this.userRepository.find({
+      where:{organisation:{id}},
       relations:['organisation'],
     });
   }
@@ -106,10 +115,34 @@ export class UsersService {
     return user;
   } */
 
-  async findUsersByOrganisationId(id: number) {
-    return this.userRepository.find({
-      where: { organisation: { id } },
+
+  async findUsersByLoggedInAdmin(@GetUser() user: any) {
+    const loggedInUserId = user.id;
+    const loggedInUser = await this.userRepository.findOne({
+      where:{id:loggedInUserId},
+      relations:['organisation']});
+    let users = await this.userRepository.find({
+      where: { organisation: { id: loggedInUser.organisation?.id } },
     });
+    if(!users) {
+      throw new HttpException('No users found', HttpStatus.NOT_FOUND);
+    }
+      
+    return users
+  }
+  
+  async findOneByNameOrEmail(nameOrEmail: string,@GetUser() user: any) {
+    const loggedInUserId = user.id;
+    const loggedInUser = await this.userRepository.findOne(loggedInUserId);
+    
+    let users = this.userRepository.createQueryBuilder('user')
+    .where('user.name = :nameOrEmail OR user.email = :nameOrEmail', { nameOrEmail })
+    .andWhere('user.organisation = :organisationId', { organisationId: loggedInUser.organisation?.id })
+    .getMany();
+    if(!users) {
+      throw new HttpException('No users found', HttpStatus.NOT_FOUND);
+    }
+    return users
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

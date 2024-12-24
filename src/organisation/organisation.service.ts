@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { CreateOrganisationDto } from './dto/create-organisation.dto';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
 import { Organisation } from './entities/organisation.entity';
@@ -16,6 +16,17 @@ export class OrganisationService {
       createOrganisationDto,
     );
     return organisation;
+  }
+
+  async uploadFile(id: number, file: Express.Multer.File) {
+    const organisation = await this.organisationRepository.findOneBy({ id });
+    if (!organisation) {
+      throw new HttpException('Organisation not found', HttpStatus.NOT_FOUND);
+    }
+    organisation.CAC = file.path;
+    const newUpload = await this.organisationRepository.save(organisation);
+    console.log(newUpload);
+    return { message: 'File uploaded successfully', path: newUpload.CAC };
   }
 
   async findAll(): Promise<any[]> {
@@ -41,10 +52,19 @@ export class OrganisationService {
   }
 
   update(id: number, updateOrganisationDto: UpdateOrganisationDto) {
-    return `This action updates a #${id} organisation ${updateOrganisationDto}`;
+    return this.organisationRepository.update(id, updateOrganisationDto);
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} organisation`;
+  async approveOrganisation(id: number, approved: boolean) {
+    const organisation = await this.organisationRepository.findOneBy({ id });
+    organisation.approved = approved;
+    return this.organisationRepository.save(organisation);
+  }
+
+  async remove(id: number) {
+    const Organisation = await this.organisationRepository.findOneBy({ id });
+    Organisation.status = 'inactive';
+    await this.organisationRepository.save(Organisation);
+    return Organisation;
   }
 }

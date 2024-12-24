@@ -8,18 +8,7 @@ import { OrganisationModule } from 'src/organisation/organisation.module';
 @Module({
   imports: [TypeOrmModule.forFeature([User]), OrganisationModule],
   controllers: [UsersController],
-  providers: [
-    UsersService,
-    // If I wanted to apply them globally
-    /* {
-      provide: APP_GUARD,
-      useClass: AuthGuard, // AuthGuard runs first
-    },
-    {
-      provide: APP_GUARD,
-      useClass: RolesGuard,
-    }, */
-  ],
+  providers: [UsersService],
   exports: [UsersService],
 })
 export class UsersModule {}

@@ -94,7 +94,7 @@ export class UsersService {
   async findOne(id: number) {
     return await this.userRepository.findOne({
       where: { id },
-      relations: ['organisation'],
+      relations: ['organisation', 'tasksAssigned', 'tasksReceived'],
     });
   }
 

@@ -19,3 +19,42 @@ export class RolesGuard implements CanActivate {
     return requiredRoles.some((role) => user.roles?.includes(role));
   }
 }
+
+@Injectable()
+export class SuperAdminGuard implements CanActivate {
+  
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    return user.role === Role.SuperAdmin;
+  }
+}
+@Injectable()
+export class AdminGuard implements CanActivate {
+  
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    return user.role === Role.Admin;
+  }
+}
+
+@Injectable()
+export class AdminandUserGuard implements CanActivate {
+  
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    return user.role === Role.Admin || user.role === Role.User;
+  }
+}
+
+@Injectable()
+export class SuperAdminandAdminGuard implements CanActivate {
+  
+  async canActivate(context: ExecutionContext): Promise<boolean> {
+    const request = context.switchToHttp().getRequest();
+    const user = request.user;
+    return user.role === Role.Admin || user.role === Role.SuperAdmin;
+  }
+}

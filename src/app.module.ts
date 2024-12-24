@@ -10,13 +10,14 @@ import { CommentsModule } from './comments/comments.module';
 import { UsersModule } from './users/users.module';
 import { ConfigModule } from '@nestjs/config';
 
+
 @Module({
   imports: [ConfigModule.forRoot({
     isGlobal: true,
     envFilePath: '.env',
   }),
   OrganisationModule,AuthModule, DatabaseModule, HistoryModule, TasksModule, CommentsModule, UsersModule,  ],
-  controllers: [AppController],
+  controllers: [AppController ],
   providers: [AppService],
 })
 export class AppModule {}

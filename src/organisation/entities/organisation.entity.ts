@@ -22,5 +22,8 @@ export class Organisation {
 
     @Column({ default: 'active' })
     status: string
+
+    @Column({ default: false })
+    approved: boolean;
     
 }

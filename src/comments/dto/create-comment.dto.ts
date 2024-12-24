@@ -5,12 +5,9 @@ export class CreateCommentDto {
     @IsNotEmpty()
     comment: string;
 
-    
     @IsNotEmpty()
     task: { id: number; }; 
 
-    
-    @IsNotEmpty()
     user: { id: number; };
 
 }

@@ -25,13 +25,7 @@ export class User {
   @OneToMany(() => Comment, (comment) => comment.user)
   comments: Comment[];
 
-  // This line connects a user to the organisation they belong to, if any.
-  // "ManyToOne" means that one user can only belong to one organisation.
-  // The organisation can have many users (One-To-Many).
-  // The "nullable: true" means that the user doesn't have to belong to an organisation.
-  // If the user is an individual, the organisation will be null.
-  // The "organisation?" is a shorthand way of saying that the organisation is optional.
-  // The ": Organisation | null" means that the organisation can be either an Organisation object or null.
+  
   @ManyToOne(() => Organisation, (organisation) => organisation.users, {
     nullable: true,
   })

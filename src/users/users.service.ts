@@ -16,6 +16,8 @@ export class UsersService {
     private readonly organisationsService: OrganisationService,
   ) { }
 
+
+  //For the sake of quality code i need to check if an admin is creating a user and put info such as organisation id and role automatically
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { type, ...userData } = createUserDto;
 

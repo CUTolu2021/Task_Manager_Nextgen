@@ -11,6 +11,7 @@ import { error } from 'console';
 import { REQUEST } from '@nestjs/core';
 import { request } from 'http';
 import { GetUser } from 'src/decorator/getUserDecorator';
+import { Role } from 'src/auth/role.enum';
 
 @Injectable()
 export class TasksService {
@@ -49,12 +50,12 @@ export class TasksService {
         }
       }
 
-
+      //History is working for both individual and organisation users
       const task = this.tasksRepository.save(createTaskDto);
       const createHistoryDto = new CreateHistoryDto();
       createHistoryDto.action = HistoryAction.CREATED;
       createHistoryDto.task = { id: (await task).id };
-      createHistoryDto.user = { id: user.id }; // this should change to the id of the person that is logged in
+      createHistoryDto.user = { id: user.id }; 
       createHistoryDto.createdAt = new Date();
       await this.historyRepository.save(createHistoryDto);
       return task;
@@ -78,10 +79,17 @@ export class TasksService {
       const loggedInUser = await this.usersService.findOne(loggedInUserId);
       const loggedInUserOrganisationId = loggedInUser.organisation?.id
         
-    // const tasks = this.tasksRepository.find({
-    //   relations: ['assignedBy', 'assignedTo', 'comments', 'organisation'],
-    // })
-    // return tasks;
+    if(user.type?.toLowerCase() === 'individual'){
+      const tasks = await this.tasksRepository.find({
+        where: {
+          assignedTo: {
+            id: loggedInUserId,
+          }
+        },
+        relations: ['assignedBy', 'assignedTo', 'comments', ],
+      });
+      return tasks;
+    }
     const tasks = await this.tasksRepository.find({
       where: {
         organisation: {
@@ -89,13 +97,8 @@ export class TasksService {
         }
          },
          relations: ['assignedBy', 'assignedTo', 'comments', ],
-     
     });
     return tasks;
-  
-
-    // const tasks = this.tasksRepository.query(`SELECT * from tasks where organisationId = ${loggedInUserOrganisationId}`)
-    // return tasks;
   }
 
 
@@ -107,34 +110,61 @@ export class TasksService {
     return task;
   }
 
+  async findOneByOrganisation(id: number, @GetUser() user: any) {
+    const loggedInUserId = user.id;
+      const loggedInUser = await this.usersService.findOne(loggedInUserId);
+      const loggedInUserOrganisationId = loggedInUser.organisation?.id
+    const task = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['assignedBy', 'assignedTo', 'comments', 'organisation'],
+    });
+    if (task.organisation.id !== loggedInUserOrganisationId) {
+      throw new NotFoundException('Task not found');
+    }
+    return task;
+  }
+
   async update(id: number, updateTaskDto: UpdateTaskDto, @GetUser() user: any) {
     //The people who can update are admin of the organisation, or the user who assigned the task. Think about the personal users too
     const loggedInUserId = user.id;
-    let Mytask = await this.tasksRepository.findOne({ where: { id } });
+    let Mytask = await this.tasksRepository.findOne({ where: { id },
+      relations: ['assignedBy', 'assignedTo'], });
     if (Mytask.assignedTo.id !== loggedInUserId || Mytask.assignedBy.id !== loggedInUserId) {
       throw new NotFoundException('You are not authorized to update this task');
     }
-    let task = await this.tasksRepository.update(id, updateTaskDto);
+    if(user.role === Role.User && user.type === 'organisation'){
+      //if a user should update a task he is most likely wanting to mark it as completed
+      Mytask.status = taskStatus.COMPLETED
+      await this.tasksRepository.save(Mytask);
+    }
+    else
+    {
+      await this.tasksRepository.update(id, updateTaskDto);
+    }
     
     const createHistoryDto = new CreateHistoryDto();
-    if (updateTaskDto.status === taskStatus.COMPLETED) {
+    if (updateTaskDto.status === taskStatus.COMPLETED || Mytask.status === taskStatus.COMPLETED) {
       createHistoryDto.action = HistoryAction.COMPLETED;
     }
     else {
       createHistoryDto.action = HistoryAction.UPDATED;
     }
-    console.log(updateTaskDto);
     createHistoryDto.task = { id };
-    createHistoryDto.user = { id: updateTaskDto.assignedBy.id }; // this should change to the id of the person that is logged in
+    createHistoryDto.user = { id: user.id }; 
     createHistoryDto.createdAt = new Date();
     await this.historyRepository.save(createHistoryDto);
-    return task;
+    return await this.tasksRepository.findOne({ where: { id } });
   }
 
-  async remove(id: number) {
-    const Task = await this.tasksRepository.findOneBy({ id });
+  async remove(id: number, @GetUser() user: any) {
+    const Task = await this.tasksRepository.findOne({ where: { id },
+      relations: ['assignedBy', 'assignedTo'], });
     if (!Task) {
       throw new NotFoundException('Task not found');
+    }
+    const loggedInUserId = user.id;
+    if (Task.assignedTo.id !== loggedInUserId || Task.assignedBy.id !== loggedInUserId) {
+      throw new NotFoundException('Task not found');//Reason for errors like this is to show multitenancy
     }
     Task.deleted = deleted.YES;
     await this.tasksRepository.save(Task);

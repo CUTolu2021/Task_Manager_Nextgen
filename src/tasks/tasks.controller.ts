@@ -5,6 +5,7 @@ import { UpdateTaskDto } from './dto/update-task.dto';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { TaskCreationGuard } from './tasks.guard';
 import { GetUser } from 'src/decorator/getUserDecorator';
+import { AdminandUserGuard, AdminGuard } from 'src/auth/roles.guard';
 
 
 @UseGuards(AuthGuard)
@@ -22,9 +23,10 @@ export class TasksController {
     return this.tasksService.findAll(user);
   }
 
+  @UseGuards(AdminGuard)
   @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.tasksService.findOne(+id);
+  findOne(@Param('id') id: string, @GetUser() user: any) {
+    return this.tasksService.findOneByOrganisation(+id, user);
   }
 
   @Patch(':id')
@@ -32,8 +34,9 @@ export class TasksController {
     return this.tasksService.update(+id, updateTaskDto, user);
   }
 
+  @UseGuards(AdminandUserGuard)
   @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.tasksService.remove(+id);
+  remove(@Param('id') id: string, @GetUser() user: any) {
+    return this.tasksService.remove(+id, user);
   }
 }

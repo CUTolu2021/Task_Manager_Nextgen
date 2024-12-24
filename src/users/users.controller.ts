@@ -18,7 +18,7 @@ import { GetUser } from 'src/decorator/getUserDecorator';
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-//Post route is needed for admins to create users
+//Post route is needed for admins to create users since signup is implemented
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.createUser(createUserDto);

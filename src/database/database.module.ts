@@ -7,17 +7,17 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      logging: 'all',
+      //logging: 'all',
       type: 'postgres',
-      url: process.env.DATABASE_URL,
+      //url: process.env.DATABASE_URL,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],
       synchronize: true,
 
-      /* host: 'localhost',
+      host: 'localhost',
       port: 5432,
       username: 'postgres',
-      password: 'gendary6',
-      database: 'task_manager', */
+      password: 'Leg',
+      database: 'task_manager',
     }),
   ],
   providers: [DatabaseService],

@@ -18,6 +18,7 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
     userData.password = hashedPassword;
     const user = await this.usersService.createUser(userData);
+    console.log(userData);
     if (!user) {
       throw new Error('User creation failed');
     }

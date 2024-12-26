@@ -5,11 +5,10 @@ export class CreateOrganisationDto {
   @IsNotEmpty()
   name: string;
 
-  @IsNumber()
-  /* @IsNotEmpty() */
-  userId?: number;
-
   @IsString()
   @IsNotEmpty()
   CAC: string;
+
+  @IsNumber()
+  userId?: number;
 }

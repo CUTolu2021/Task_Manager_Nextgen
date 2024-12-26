@@ -1,4 +1,9 @@
-import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
@@ -14,8 +19,7 @@ export class UsersService {
     @InjectRepository(User)
     private userRepository: Repository<User>,
     private readonly organisationsService: OrganisationService,
-  ) { }
-
+  ) {}
 
   //For the sake of quality code i need to check if an admin is creating a user and put info such as organisation id and role automatically
   async createUser(createUserDto: CreateUserDto): Promise<User> {
@@ -45,8 +49,7 @@ export class UsersService {
           CAC: userData.organisationCAC,
         });
       }
-    } 
-    else if (type === 'organisation' && userData.role === 'user') {
+    } else if (type === 'organisation' && userData.role === 'user') {
       if (!userData.organisationId) {
         throw new HttpException(
           'Organisation ID is required for organisation user',
@@ -62,11 +65,9 @@ export class UsersService {
           HttpStatus.NOT_FOUND,
         );
       }
-    } 
-    else if (type === 'individual') {
+    } else if (type === 'individual') {
       organisation = null;
-    } 
-    else {
+    } else {
       throw new HttpException('Invalid user type', HttpStatus.BAD_REQUEST);
     }
 
@@ -92,15 +93,15 @@ export class UsersService {
 
   async findOne(id: number) {
     return await this.userRepository.findOne({
-      where:{id},
-      relations:['organisation'],
+      where: { id },
+      relations: ['organisation', 'tasksAssigned', 'tasksReceived'],
     });
   }
 
   async findByOrganisation(id: number) {
     return await this.userRepository.find({
-      where:{organisation:{id}},
-      relations:['organisation'],
+      where: { organisation: { id } },
+      relations: ['organisation'],
     });
   }
 
@@ -117,34 +118,39 @@ export class UsersService {
     return user;
   } */
 
-
   async findUsersByLoggedInAdmin(@GetUser() user: any) {
     const loggedInUserId = user.id;
     const loggedInUser = await this.userRepository.findOne({
-      where:{id:loggedInUserId},
-      relations:['organisation']});
-    let users = await this.userRepository.find({
+      where: { id: loggedInUserId },
+      relations: ['organisation'],
+    });
+    const users = await this.userRepository.find({
       where: { organisation: { id: loggedInUser.organisation?.id } },
     });
-    if(!users) {
+    if (!users) {
       throw new HttpException('No users found', HttpStatus.NOT_FOUND);
     }
-      
-    return users
+
+    return users;
   }
-  
-  async findOneByNameOrEmail(nameOrEmail: string,@GetUser() user: any) {
+
+  async findOneByNameOrEmail(nameOrEmail: string, @GetUser() user: any) {
     const loggedInUserId = user.id;
     const loggedInUser = await this.userRepository.findOne(loggedInUserId);
-    
-    let users = this.userRepository.createQueryBuilder('user')
-    .where('user.name = :nameOrEmail OR user.email = :nameOrEmail', { nameOrEmail })
-    .andWhere('user.organisation = :organisationId', { organisationId: loggedInUser.organisation?.id })
-    .getMany();
-    if(!users) {
+
+    const users = this.userRepository
+      .createQueryBuilder('user')
+      .where('user.name = :nameOrEmail OR user.email = :nameOrEmail', {
+        nameOrEmail,
+      })
+      .andWhere('user.organisation = :organisationId', {
+        organisationId: loggedInUser.organisation?.id,
+      })
+      .getMany();
+    if (!users) {
       throw new HttpException('No users found', HttpStatus.NOT_FOUND);
     }
-    return users
+    return users;
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {

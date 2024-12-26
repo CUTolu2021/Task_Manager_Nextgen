@@ -10,10 +10,11 @@ import { multerConfig } from './multer.config';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Organisation]),
-    DatabaseModule,MulterModule.register(multerConfig)
+    DatabaseModule,
+    MulterModule.register(multerConfig),
   ],
-  providers: [OrganisationService]
-  , controllers: [ OrganisationController],
+  providers: [OrganisationService],
+  controllers: [OrganisationController],
   exports: [OrganisationService],
 })
 export class OrganisationModule {}

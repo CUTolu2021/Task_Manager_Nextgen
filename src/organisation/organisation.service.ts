@@ -18,17 +18,15 @@ export class OrganisationService {
     return organisation;
   }
 
-  async uploadFile(id: number,file: Express.Multer.File) {
-    const organisation = await this.organisationRepository.findOneBy({id});
+  async uploadFile(id: number, file: Express.Multer.File) {
+    const organisation = await this.organisationRepository.findOneBy({ id });
     if (!organisation) {
-    throw new HttpException('Organisation not found', HttpStatus.NOT_FOUND);
-  }
+      throw new HttpException('Organisation not found', HttpStatus.NOT_FOUND);
+    }
     organisation.CAC = file.path;
-    let newUpload = await this.organisationRepository.save(organisation);
+    const newUpload = await this.organisationRepository.save(organisation);
     console.log(newUpload);
-    return { message: 'File uploaded successfully', 
-      path: newUpload.CAC
-    };
+    return { message: 'File uploaded successfully', path: newUpload.CAC };
   }
 
   async findAll(): Promise<any[]> {
@@ -58,14 +56,14 @@ export class OrganisationService {
   }
 
   async approveOrganisation(id: number, approved: boolean) {
-    const organisation = await this.organisationRepository.findOneBy({id});
+    const organisation = await this.organisationRepository.findOneBy({ id });
     organisation.approved = approved;
     return this.organisationRepository.save(organisation);
   }
 
   async remove(id: number) {
     const Organisation = await this.organisationRepository.findOneBy({ id });
-    Organisation.status = 'inactive'; 
+    Organisation.status = 'inactive';
     await this.organisationRepository.save(Organisation);
     return Organisation;
   }

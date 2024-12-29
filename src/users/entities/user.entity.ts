@@ -34,12 +34,8 @@ export class User {
   @ManyToOne(() => Organisation, (organisation) => organisation.users, {
     nullable: true,
   })
-  organisation?: Organisation | null; // Null for type: individual
-
-  // This line is like a map that shows how to find the organisation that a user belongs to.
-  // It's like a direction that says "Hey, to find the organisation that this user belongs to, go to the organisation table and find the row that has the same id as the user's organisationId".
-  // The @JoinColumn() is like a label that says "Hey, I'm the direction to the organisation table!"
-
+  organisation?: Organisation | null;
+  
   @OneToMany(() => Task, (task) => task.assignedBy)
   tasksAssigned: Task[];
 

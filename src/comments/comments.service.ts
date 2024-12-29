@@ -35,20 +35,15 @@ export class CommentsService {
 
     catch (error) {
       if (error instanceof QueryFailedError) {
-        // handle the foreign key violation error
         console.error('Error saving comment:', error);
-        // log the error, display an error message to the user, etc.
         throw new NotFoundException('Failed to save comment. Please check the task ID. task was not found.');
       }
       else {
-        // handle other types of errors
         throw error;
       }
     }
   }
 
-
-  //This function is not necessary since comment are attacthed to task
   findAll() {
     return this.commentsRepository.find({
       relations: ['task', 'user'],
@@ -104,6 +99,5 @@ export class CommentsService {
     else {
       throw new HttpException('Comment does not exist. Please check the comment ID', HttpStatus.BAD_REQUEST);
     }
-
   }
 }

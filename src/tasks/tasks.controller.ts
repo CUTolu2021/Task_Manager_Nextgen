@@ -17,7 +17,6 @@ import { GetUser } from 'src/decorator/getUserDecorator';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { Role } from 'src/auth/role.enum';
-//import { AdminandUserGuard, AdminGuard } from 'src/auth/roles.guard';
 
 @UseGuards(AuthGuard)
 @Controller('tasks')
@@ -34,7 +33,6 @@ export class TasksController {
     return this.tasksService.findAll(user);
   }
 
-  //@UseGuards(AdminGuard)
   @UseGuards(RolesGuard)
   @Get(':id')
   @Roles(Role.Admin, Role.SuperAdmin, Role.SubAdmin)
@@ -51,7 +49,6 @@ export class TasksController {
     return this.tasksService.update(+id, updateTaskDto, user);
   }
 
-  //@UseGuards(AdminandUserGuard)
   @UseGuards(RolesGuard)
   @Delete(':id')
   @Roles(Role.User, Role.Admin)

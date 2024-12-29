@@ -21,13 +21,11 @@ export class UsersService {
     private readonly organisationsService: OrganisationService,
   ) {}
 
-  //For the sake of quality code i need to check if an admin is creating a user and put info such as organisation id and role automatically
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { type, ...userData } = createUserDto;
 
     let organisation: Organisation | null = null;
-    //console.log("In side userservice file: ", userData);
-
+    
     if (type === 'organisation' && userData.role === 'admin') {
       if (!userData.organisationName || !userData.organisationCAC) {
         throw new HttpException(
@@ -65,10 +63,11 @@ export class UsersService {
           HttpStatus.NOT_FOUND,
         );
       }
-    } else if (type === 'individual') {
+    } 
+    
+    else {
+      userData.role = 'user';
       organisation = null;
-    } else {
-      throw new HttpException('Invalid user type', HttpStatus.BAD_REQUEST);
     }
 
     const user = this.userRepository.create({

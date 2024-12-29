@@ -1,15 +1,12 @@
-import { ExecutionContext, HttpException, HttpStatus, Injectable, NotFoundException, Req } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
 import { CreateHistoryDto } from 'src/history/dto/create-history.dto';
-import { Not, QueryFailedError, Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { deleted, Task, taskStatus } from './entities/task.entity';
 import { UsersService } from 'src/users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { History, HistoryAction } from 'src/history/entities/history.entity';
-import { error } from 'console';
-import { REQUEST } from '@nestjs/core';
-import { request } from 'http';
 import { GetUser } from 'src/decorator/getUserDecorator';
 import { Role } from 'src/auth/role.enum';
 
@@ -24,10 +21,6 @@ export class TasksService {
   ) { }
   async create(createTaskDto: CreateTaskDto, @GetUser() user: any) {
     try {
-      //const request = context.switchToHttp().getRequest();
-      //const activeUser = user;
-      //check if logged in user organisation is same as the organisation of the user he has assigned a task to
-      //if(user.organisation === .assignedBy.id) {
       const loggedInUserId = user.id;
       const loggedInUser = await this.usersService.findOne(loggedInUserId);
       if (user.type?.toLowerCase() === 'individual') {
@@ -43,8 +36,7 @@ export class TasksService {
         if ((loggedInUserOrganisationId === AssignedToOrgId)) {
           createTaskDto.assignedBy = { id: user.id, name: loggedInUser.name }
           createTaskDto.organisation = { id: loggedInUserOrganisationId }
-          //console.log(`This admin is from organisation ${loggedInUser.organisation.name} and the user he assigned a task to ${AssignedTo} `)
-        }
+       }
         else {
           throw new HttpException('User not a member of your Organisation', HttpStatus.BAD_REQUEST);
         }
@@ -62,12 +54,9 @@ export class TasksService {
     }
     catch (error) {
       if (error instanceof QueryFailedError) {
-        // handle the foreign key violation error
         console.error('Error saving task:', error);
-        // log the error, display an error message to the user, etc.
         throw new NotFoundException('Failed to assign task. Please check the assignedTo user ID. User was not found.');
       } else {
-        // handle other types of errors
         throw error;
       }
     }
@@ -85,8 +74,7 @@ export class TasksService {
           assignedTo: {
             id: loggedInUserId,
           }
-        },
-        relations: ['assignedBy', 'assignedTo', 'comments', ],
+        }
       });
       return tasks;
     }

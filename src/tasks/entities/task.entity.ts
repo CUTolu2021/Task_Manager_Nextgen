@@ -1,6 +1,6 @@
-import { Comment } from '..comments/entities/comment.entity';
-import { Organisation } from '../organisation/entities/organisation.entity';
-import { User } from '../users/entities/user.entity';
+import { Comment } from '../../comments/entities/comment.entity';
+import { Organisation } from '../../organisation/entities/organisation.entity';
+import { User } from '../../users/entities/user.entity';
 
 import { Entity, Column, PrimaryGeneratedColumn, OneToMany, ManyToOne, CreateDateColumn, UpdateDateColumn, Or } from 'typeorm';
 

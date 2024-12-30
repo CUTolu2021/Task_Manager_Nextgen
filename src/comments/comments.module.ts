@@ -3,7 +3,7 @@ import { CommentsService } from './comments.service';
 import { CommentsController } from './comments.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { Comment } from './entities/comment.entity';
-import { TasksModule } from '..tasks/tasks.module';
+import { TasksModule } from '../tasks/tasks.module';
 import { UsersModule } from '../users/users.module';
 
 @Module({

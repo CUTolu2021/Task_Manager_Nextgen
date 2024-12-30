@@ -11,12 +11,12 @@ import {
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { TaskCreationGuard } from './tasks.guard';
-import { GetUser } from 'src/decorator/getUserDecorator';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'src/auth/role.enum';
+import { GetUser } from '../decorator/getUserDecorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/role.enum';
 
 @UseGuards(AuthGuard)
 @Controller('tasks')

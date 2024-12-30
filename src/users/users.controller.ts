@@ -11,11 +11,11 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { GetUser } from 'src/decorator/getUserDecorator';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'src/auth/role.enum';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import { GetUser } from '../decorator/getUserDecorator';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/role.enum';
+import { RolesGuard } from '../auth/roles.guard';
 
 @UseGuards(AuthGuard)
 @Controller('users')

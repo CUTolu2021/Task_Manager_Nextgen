@@ -4,9 +4,9 @@ import { UpdateCommentDto } from './dto/update-comment.dto';
 import { Comment } from './entities/comment.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { QueryFailedError, Repository } from 'typeorm';
-import { TasksService } from 'src/tasks/tasks.service';
-import { UsersService } from 'src/users/users.service';
-import { GetUser } from 'src/decorator/getUserDecorator';
+import { TasksService } from '../tasks/tasks.service';
+import { UsersService } from '../users/users.service';
+import { GetUser } from '../decorator/getUserDecorator';
 
 @Injectable()
 export class CommentsService {

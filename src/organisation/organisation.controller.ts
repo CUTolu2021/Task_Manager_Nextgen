@@ -12,11 +12,11 @@ import {
 } from '@nestjs/common';
 import { OrganisationService } from './organisation.service';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'src/auth/role.enum';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/role.enum';
 
 @UseGuards(AuthGuard)
 @Controller('organisation')

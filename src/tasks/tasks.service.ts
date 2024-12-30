@@ -1,14 +1,14 @@
 import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { CreateHistoryDto } from 'src/history/dto/create-history.dto';
+import { CreateHistoryDto } from '../history/dto/create-history.dto';
 import { QueryFailedError, Repository } from 'typeorm';
 import { deleted, Task, taskStatus } from './entities/task.entity';
-import { UsersService } from 'src/users/users.service';
+import { UsersService } from '../users/users.service';
 import { InjectRepository } from '@nestjs/typeorm';
-import { History, HistoryAction } from 'src/history/entities/history.entity';
-import { GetUser } from 'src/decorator/getUserDecorator';
-import { Role } from 'src/auth/role.enum';
+import { History, HistoryAction } from '../history/entities/history.entity';
+import { GetUser } from '../decorator/getUserDecorator';
+import { Role } from '../auth/role.enum';
 
 @Injectable()
 export class TasksService {

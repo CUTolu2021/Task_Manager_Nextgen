@@ -9,9 +9,9 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Organisation } from 'src/organisation/entities/organisation.entity';
-import { OrganisationService } from 'src/organisation/organisation.service';
-import { GetUser } from 'src/decorator/getUserDecorator';
+import { Organisation } from '../organisation/entities/organisation.entity';
+import { OrganisationService } from '..organisation/organisation.service';
+import { GetUser } from '../decorator/getUserDecorator';
 
 @Injectable()
 export class UsersService {

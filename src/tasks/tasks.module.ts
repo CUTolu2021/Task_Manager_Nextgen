@@ -2,10 +2,10 @@ import { MiddlewareConsumer, Module, NestModule, RequestMethod } from '@nestjs/c
 import { TasksService } from './tasks.service';
 import { TasksController } from './tasks.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { OrganisationModule } from 'src/organisation/organisation.module';
+import { OrganisationModule } from '../organisation/organisation.module';
 import { Task } from './entities/task.entity';
-import { UsersModule } from 'src/users/users.module';
-import { History } from 'src/history/entities/history.entity';
+import { UsersModule } from '../users/users.module';
+import { History } from '../history/entities/history.entity';
 
 @Module({
   imports: [TypeOrmModule.forFeature([Task,History]), OrganisationModule, UsersModule ],

@@ -5,9 +5,9 @@ import {
   ManyToOne,
   OneToMany,
 } from 'typeorm';
-import { Organisation } from 'src/organisation/entities/organisation.entity';
-import { Task } from 'src/tasks/entities/task.entity';
-import { Comment } from 'src/comments/entities/comment.entity';
+import { Organisation } from '../organisation/entities/organisation.entity';
+import { Task } from '../tasks/entities/task.entity';
+import { Comment } from '../comments/entities/comment.entity';
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()

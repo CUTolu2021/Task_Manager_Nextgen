@@ -10,7 +10,7 @@ import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
 import { Organisation } from '../organisation/entities/organisation.entity';
-import { OrganisationService } from '..organisation/organisation.service';
+import { OrganisationService } from '../organisation/organisation.service';
 import { GetUser } from '../decorator/getUserDecorator';
 
 @Injectable()

@@ -4,7 +4,7 @@ import { UpdateOrganisationDto } from './dto/update-organisation.dto';
 import { Organisation } from './entities/organisation.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { uploadCAC } from 'src/cloudinary';
+import { uploadCAC } from '../cloudinary';
 
 @Injectable()
 export class OrganisationService {

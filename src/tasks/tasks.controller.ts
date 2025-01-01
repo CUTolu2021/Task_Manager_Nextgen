@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
@@ -17,6 +18,7 @@ import { GetUser } from '../decorator/getUserDecorator';
 import { RolesGuard } from '../auth/roles.guard';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
+import { PaginationDto } from '../pagination.dto';
 
 @UseGuards(AuthGuard)
 @Controller('tasks')
@@ -29,8 +31,9 @@ export class TasksController {
   }
 
   @Get()
-  findAll(@GetUser() user: any) {
-    return this.tasksService.findAll(user);
+  findAll(@Query() paginationDto: PaginationDto, @GetUser() user: any) {
+    console.log(paginationDto.limit ,"and", paginationDto.skip);
+    return this.tasksService.findAll(paginationDto, user);
   }
 
   @UseGuards(RolesGuard)

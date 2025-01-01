@@ -7,6 +7,7 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -16,6 +17,7 @@ import { GetUser } from '../decorator/getUserDecorator';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
 import { RolesGuard } from '../auth/roles.guard';
+import { PaginationDto } from '../pagination.dto';
 
 @UseGuards(AuthGuard)
 @Controller('users')
@@ -30,8 +32,8 @@ export class UsersController {
   @UseGuards(RolesGuard)
   @Get()
   @Roles(Role.Admin, Role.SuperAdmin, Role.SubAdmin)
-  findAll(@GetUser() user: any) {
-    return this.usersService.findUsersByLoggedInAdmin(user);
+  findAll(@Query() paginationDto: PaginationDto,@GetUser() user: any) {
+    return this.usersService.findUsersByLoggedInAdmin(paginationDto,user);
   }
 
   @Get(':id')

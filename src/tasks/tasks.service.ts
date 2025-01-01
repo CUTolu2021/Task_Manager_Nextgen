@@ -9,6 +9,7 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { History, HistoryAction } from '../history/entities/history.entity';
 import { GetUser } from '../decorator/getUserDecorator';
 import { Role } from '../auth/role.enum';
+import { PaginationDto } from 'src/pagination.dto';
 
 @Injectable()
 export class TasksService {
@@ -63,13 +64,15 @@ export class TasksService {
   }
 
 
-  async findAll(@GetUser() user: any) {
+  async findAll(paginationDto: PaginationDto,@GetUser() user: any) {
     const loggedInUserId = user.id;
       const loggedInUser = await this.usersService.findOne(loggedInUserId);
       const loggedInUserOrganisationId = loggedInUser.organisation?.id
         
     if(user.type?.toLowerCase() === 'individual'){
       const tasks = await this.tasksRepository.find({
+        skip: paginationDto.skip,
+        take: paginationDto.limit || 5,
         where: {
           assignedTo: {
             id: loggedInUserId,
@@ -79,6 +82,8 @@ export class TasksService {
       return tasks;
     }
     const tasks = await this.tasksRepository.find({
+      take: paginationDto.limit || 5,
+      skip: paginationDto.skip,
       where: {
         organisation: {
           id: loggedInUserOrganisationId,
@@ -86,6 +91,7 @@ export class TasksService {
          },
          relations: ['assignedBy', 'assignedTo', 'comments', ],
     });
+    console.log(paginationDto.limit);
     return tasks;
   }
 

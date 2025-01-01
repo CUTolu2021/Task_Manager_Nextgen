@@ -12,6 +12,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { Organisation } from '../organisation/entities/organisation.entity';
 import { OrganisationService } from '../organisation/organisation.service';
 import { GetUser } from '../decorator/getUserDecorator';
+import { PaginationDto } from '../pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -117,13 +118,15 @@ export class UsersService {
     return user;
   } */
 
-  async findUsersByLoggedInAdmin(@GetUser() user: any) {
+  async findUsersByLoggedInAdmin(paginationDto: PaginationDto,@GetUser() user: any) {
     const loggedInUserId = user.id;
     const loggedInUser = await this.userRepository.findOne({
       where: { id: loggedInUserId },
       relations: ['organisation'],
     });
     const users = await this.userRepository.find({
+      skip: paginationDto.skip,
+      take: paginationDto.limit || 5,
       where: { organisation: { id: loggedInUser.organisation?.id } },
     });
     if (!users) {

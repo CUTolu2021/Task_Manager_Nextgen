@@ -5,7 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { QueryFailedError, Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -40,6 +40,7 @@ export class UsersService {
         userData.organisationName,
         userData.organisationCAC,
       );
+      console.log(organisation);
 
       if (!organisation) {
         // Create new organisation if it doesn't exist
@@ -47,6 +48,8 @@ export class UsersService {
           name: userData.organisationName,
           CAC: userData.organisationCAC,
         });
+        console.log("new",organisation);
+
       }
     } else if (type === 'organisation' && userData.role === 'user') {
       if (!userData.organisationId) {

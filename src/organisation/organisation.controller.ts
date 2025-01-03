@@ -17,6 +17,7 @@ import { RolesGuard } from '../auth/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Roles } from '../auth/roles.decorator';
 import { Role } from '../auth/role.enum';
+import { GetUser } from 'src/decorator/getUserDecorator';
 
 @UseGuards(AuthGuard)
 @Controller('organisation')
@@ -59,8 +60,9 @@ export class OrganisationController {
   update(
     @Param('id') id: string,
     @Body() updateOrganisationDto: UpdateOrganisationDto,
+    @GetUser() user: any,
   ) {
-    return this.organisationService.update(+id, updateOrganisationDto);
+    return this.organisationService.update(+id, updateOrganisationDto, user);
   }
 
   //I assume i can have another patch request in the future case i want to change the approve status to false.

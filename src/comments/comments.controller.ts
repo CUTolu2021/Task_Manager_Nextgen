@@ -18,11 +18,11 @@ export class CommentsController {
   }
 
   //This function is not necessary since comment are attacthed to task
- /* @Get()
-  findAll() {
-    return this.commentsService.findAll();
+  @Get('task/:id')
+  findAll(@Param('id') id: string, @GetUser() user: any) {
+    return this.commentsService.findAll(+id, user);
   }
-
+  /*
   @Get(':id')
   findOne(@Param('id') id: string) {
     return this.commentsService.findOne(+id);

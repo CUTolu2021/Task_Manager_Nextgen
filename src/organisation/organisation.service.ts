@@ -1,10 +1,11 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrganisationDto } from './dto/create-organisation.dto';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
 import { Organisation } from './entities/organisation.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { uploadCAC } from '../cloudinary';
+import { GetUser } from 'src/decorator/getUserDecorator';
 
 @Injectable()
 export class OrganisationService {
@@ -51,8 +52,26 @@ export class OrganisationService {
     });
   }
 
-  update(id: number, updateOrganisationDto: UpdateOrganisationDto) {
-    return this.organisationRepository.update(id, updateOrganisationDto);
+  async update(id: number, updateOrganisationDto: UpdateOrganisationDto, @GetUser() user: any) {
+    try {
+    const loggedInUserId = user.id;
+    const organisation = await this.organisationRepository.findOneBy({ id, users: { id: loggedInUserId } });
+    console.log(organisation);
+
+    if (organisation === null) {
+      throw new HttpException(
+        'You are not authorized to update this organisation',
+        HttpStatus.UNAUTHORIZED,
+      );
+    }
+    return await this.organisationRepository.update(id, updateOrganisationDto);
+  }
+  catch (error) {
+    if (error) {
+      console.error('Error finding organisation:', error);
+      throw new NotFoundException('Failed to find organisation. Please check the organisation ID.');
+    }
+  }
   }
 
   async approveOrganisation(id: number, approved: boolean) {
@@ -62,9 +81,9 @@ export class OrganisationService {
   }
 
   async remove(id: number) {
-    const Organisation = await this.organisationRepository.findOneBy({ id });
-    Organisation.status = 'inactive';
-    await this.organisationRepository.save(Organisation);
-    return Organisation;
+    const organisation = await this.organisationRepository.findOneBy({ id });
+    organisation.status = 'inactive';
+    await this.organisationRepository.save(organisation);
+    return organisation;
   }
 }

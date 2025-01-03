@@ -91,7 +91,6 @@ export class TasksService {
          },
          relations: ['assignedBy', 'assignedTo', 'comments', ],
     });
-    console.log(paginationDto.limit);
     return tasks;
   }
 
@@ -123,7 +122,7 @@ export class TasksService {
     const loggedInUserId = user.id;
     let Mytask = await this.tasksRepository.findOne({ where: { id },
       relations: ['assignedBy', 'assignedTo'], });
-    if (Mytask.assignedTo.id !== loggedInUserId || Mytask.assignedBy.id !== loggedInUserId) {
+    if (Mytask.assignedBy.id !== loggedInUserId) {
       throw new NotFoundException('You are not authorized to update this task');
     }
     if(user.role === Role.User && user.type === 'organisation'){
@@ -151,17 +150,18 @@ export class TasksService {
   }
 
   async remove(id: number, @GetUser() user: any) {
-    const Task = await this.tasksRepository.findOne({ where: { id },
+    const task = await this.tasksRepository.findOne({ where: { id },
       relations: ['assignedBy', 'assignedTo'], });
-    if (!Task) {
+    if (!task) {
       throw new NotFoundException('Task not found');
     }
+    console.log(task);
     const loggedInUserId = user.id;
-    if (Task.assignedTo.id !== loggedInUserId || Task.assignedBy.id !== loggedInUserId) {
+    if (task.assignedBy.id !== loggedInUserId) {
       throw new NotFoundException('Task not found');//Reason for errors like this is to show multitenancy
     }
-    Task.deleted = deleted.YES;
-    await this.tasksRepository.save(Task);
-    return Task;
+    task.deleted = deleted.YES;
+    await this.tasksRepository.save(task);
+    return task;
   }
 }

@@ -7,6 +7,7 @@ import { QueryFailedError, Repository } from 'typeorm';
 import { TasksService } from '../tasks/tasks.service';
 import { UsersService } from '../users/users.service';
 import { GetUser } from '../decorator/getUserDecorator';
+ 
 
 @Injectable()
 export class CommentsService {
@@ -26,10 +27,10 @@ export class CommentsService {
       if (taskCommented.organisation.id === loggedInUserOrganisationId) {
         createCommentDto.user = { id: loggedInUserId };
         const comment = await this.commentsRepository.save(createCommentDto);
-        return comment;
+        return comment;  
       }
       else {
-        throw new HttpException('Task does not exist in your Organisation', HttpStatus.BAD_REQUEST);
+        throw new HttpException('Task does not exist', HttpStatus.BAD_REQUEST);
       }
     }
 
@@ -44,10 +45,15 @@ export class CommentsService {
     }
   }
 
-  findAll() {
-    return this.commentsRepository.find({
-      relations: ['task', 'user'],
-    });
+  async findAll(taskId: number,@GetUser() user: any) {
+    const loggedInUserId = user.id;
+    const loggedInUser = await this.usersService.findOne(loggedInUserId);
+    const loggedInUserOrganisationId = loggedInUser.organisation?.id
+    const tasks = await this.tasksService.findOne( +taskId );
+    if (tasks.organisation.id !== loggedInUserOrganisationId) {
+      throw new HttpException('Task does not exist', HttpStatus.BAD_REQUEST);
+    }
+    return tasks.comments
   }
 
   findOne(id: number) {
@@ -58,6 +64,7 @@ export class CommentsService {
   }
 
   async update(id: number, updateCommentDto: UpdateCommentDto, @GetUser() user: any) {
+    try{
     const loggedInUserId = user.id;
     const loggedInUser = await this.usersService.findOne(loggedInUserId);
     const loggedInUserOrganisationId = loggedInUser.organisation?.id
@@ -67,15 +74,29 @@ export class CommentsService {
       relations: ['task', 'user']
     })
     const taskCommented = await this.tasksService.findOne(comment.task.id)
+    //when this taskcommented is null postman bring a internal server error wven with the try and catch there
     if (taskCommented.organisation.id === loggedInUserOrganisationId) {
-      const commment = this.commentsRepository.update(id, updateCommentDto);
-      return commment;
+      if(comment.user.id === loggedInUserId){
+        const commment = this.commentsRepository.update(id, updateCommentDto);
+        return commment;
+      }
+      else {
+        throw new HttpException('You did not create this comment.', HttpStatus.BAD_REQUEST);
+      }
     }
     else {
       throw new HttpException('Comment does not exist. Please check the comment ID', HttpStatus.BAD_REQUEST);
     }
-
-
+    }
+    catch (error) {
+      if (error) {
+        console.error('Error saving comment:', error);
+        throw new NotFoundException('Failed to save comment. Please check the comment ID. comment was not found.');
+      }
+      else {
+        throw error;
+      }
+    }
   }
 
   async remove(id: number, @GetUser() user: any) {
@@ -85,10 +106,11 @@ export class CommentsService {
 
     const comment = await this.commentsRepository.findOne({
       where: { id },
-      relations: ['task', 'user']
+      relations: ['task', 'user', 'task.assignedBy', 'task.assignedTo']
     })
-    if (comment.task.organisation.id === loggedInUserOrganisationId) {
-      if (comment.task.assignedBy.id === loggedInUserId || comment.task.assignedTo.id === loggedInUserId) {
+    const taskCommented = await this.tasksService.findOne(comment.task.id)
+    if (taskCommented.organisation.id === loggedInUserOrganisationId) {
+      if (comment.task.assignedBy.id === loggedInUserId || comment.user.id === loggedInUserId) {
         const commment = this.commentsRepository.delete(id);
         return commment;
       }

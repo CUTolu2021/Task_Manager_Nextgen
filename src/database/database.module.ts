@@ -7,7 +7,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
   imports: [
     ConfigModule.forRoot(),
     TypeOrmModule.forRoot({
-      logging: 'all',
+      //logging: 'all',
       type: 'postgres',
       url: process.env.DATABASE_URL,
       entities: [__dirname + '/../**/*.entity{.ts,.js}'],

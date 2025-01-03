@@ -4,6 +4,7 @@ import { UpdateOrganisationDto } from './dto/update-organisation.dto';
 import { Organisation } from './entities/organisation.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { uploadCAC } from '../cloudinary';
 
 @Injectable()
 export class OrganisationService {
@@ -23,14 +24,13 @@ export class OrganisationService {
     if (!organisation) {
       throw new HttpException('Organisation not found', HttpStatus.NOT_FOUND);
     }
-    organisation.CAC = file.path;
+    const url = await uploadCAC( file.buffer, organisation.name + "_CAC_" + Date.now() );
+    organisation.CAC = url;
     const newUpload = await this.organisationRepository.save(organisation);
-    console.log(newUpload);
     return { message: 'File uploaded successfully', path: newUpload.CAC };
   }
 
   async findAll(): Promise<any[]> {
-    //return await this.organisationRepository.query(`SELECT * FROM ${name}`); //`This action returns all organisation`;
     return await this.organisationRepository.find({
       relations: ['users'],
     });

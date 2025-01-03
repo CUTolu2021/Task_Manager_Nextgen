@@ -9,9 +9,10 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { CreateUserDto } from './dto/create-user.dto';
-import { Organisation } from 'src/organisation/entities/organisation.entity';
-import { OrganisationService } from 'src/organisation/organisation.service';
-import { GetUser } from 'src/decorator/getUserDecorator';
+import { Organisation } from '../organisation/entities/organisation.entity';
+import { OrganisationService } from '../organisation/organisation.service';
+import { GetUser } from '../decorator/getUserDecorator';
+import { PaginationDto } from '../pagination.dto';
 
 @Injectable()
 export class UsersService {
@@ -21,13 +22,11 @@ export class UsersService {
     private readonly organisationsService: OrganisationService,
   ) {}
 
-  //For the sake of quality code i need to check if an admin is creating a user and put info such as organisation id and role automatically
   async createUser(createUserDto: CreateUserDto): Promise<User> {
     const { type, ...userData } = createUserDto;
 
     let organisation: Organisation | null = null;
-    //console.log("In side userservice file: ", userData);
-
+    
     if (type === 'organisation' && userData.role === 'admin') {
       if (!userData.organisationName || !userData.organisationCAC) {
         throw new HttpException(
@@ -65,10 +64,11 @@ export class UsersService {
           HttpStatus.NOT_FOUND,
         );
       }
-    } else if (type === 'individual') {
+    } 
+    
+    else {
+      userData.role = 'user';
       organisation = null;
-    } else {
-      throw new HttpException('Invalid user type', HttpStatus.BAD_REQUEST);
     }
 
     const user = this.userRepository.create({
@@ -118,13 +118,15 @@ export class UsersService {
     return user;
   } */
 
-  async findUsersByLoggedInAdmin(@GetUser() user: any) {
+  async findUsersByLoggedInAdmin(paginationDto: PaginationDto,@GetUser() user: any) {
     const loggedInUserId = user.id;
     const loggedInUser = await this.userRepository.findOne({
       where: { id: loggedInUserId },
       relations: ['organisation'],
     });
     const users = await this.userRepository.find({
+      skip: paginationDto.skip,
+      take: paginationDto.limit || 5,
       where: { organisation: { id: loggedInUser.organisation?.id } },
     });
     if (!users) {

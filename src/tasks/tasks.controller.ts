@@ -7,17 +7,18 @@ import {
   Param,
   Delete,
   UseGuards,
+  Query,
 } from '@nestjs/common';
 import { TasksService } from './tasks.service';
 import { CreateTaskDto } from './dto/create-task.dto';
 import { UpdateTaskDto } from './dto/update-task.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
+import { AuthGuard } from '../auth/auth.guard';
 import { TaskCreationGuard } from './tasks.guard';
-import { GetUser } from 'src/decorator/getUserDecorator';
-import { RolesGuard } from 'src/auth/roles.guard';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'src/auth/role.enum';
-//import { AdminandUserGuard, AdminGuard } from 'src/auth/roles.guard';
+import { GetUser } from '../decorator/getUserDecorator';
+import { RolesGuard } from '../auth/roles.guard';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/role.enum';
+import { PaginationDto } from '../pagination.dto';
 
 @UseGuards(AuthGuard)
 @Controller('tasks')
@@ -30,11 +31,16 @@ export class TasksController {
   }
 
   @Get()
-  findAll(@GetUser() user: any) {
-    return this.tasksService.findAll(user);
+  findAll(
+    @Query() paginationDto: PaginationDto,
+    @Query() filterDto: Record<string, any>,
+    @GetUser() user: any,
+  ) {
+    console.log(paginationDto.limit, 'and', paginationDto.skip);
+    //console.log('user is' + user);
+    return this.tasksService.findAll(paginationDto, user, filterDto);
   }
 
-  //@UseGuards(AdminGuard)
   @UseGuards(RolesGuard)
   @Get(':id')
   @Roles(Role.Admin, Role.SuperAdmin, Role.SubAdmin)
@@ -51,7 +57,6 @@ export class TasksController {
     return this.tasksService.update(+id, updateTaskDto, user);
   }
 
-  //@UseGuards(AdminandUserGuard)
   @UseGuards(RolesGuard)
   @Delete(':id')
   @Roles(Role.User, Role.Admin)

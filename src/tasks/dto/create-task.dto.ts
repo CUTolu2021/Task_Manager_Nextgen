@@ -24,9 +24,9 @@ export class CreateTaskDto {
 
     createdAt: Date;
 
-//is not empty validator was giving me issue for creating task for individual user task creation
     assignedTo: { id: number; name: string;};
     assignedBy: { id: number; name: string;};
 
     organisation?: { id: number; };
+
 }

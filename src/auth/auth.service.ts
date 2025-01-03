@@ -2,8 +2,8 @@ import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
-import { OrganisationService } from 'src/organisation/organisation.service';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
+import { OrganisationService } from '../organisation/organisation.service';
+import { CreateUserDto } from '../users/dto/create-user.dto';
 
 @Injectable()
 export class AuthService {
@@ -18,13 +18,10 @@ export class AuthService {
     const hashedPassword = await bcrypt.hash(password, 10);
     userData.password = hashedPassword;
     const user = await this.usersService.createUser(userData);
-    console.log(userData);
     if (!user) {
       throw new Error('User creation failed');
     }
     if (user) {
-      //const { password, ...result } = user;
-
       delete user.password;
       const payload = {
         id: user.id,
@@ -52,8 +49,6 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
-    /* const { password, ...result } = user;
-    console.log('password is' + password); */
     delete user.password;
 
     const payload = {

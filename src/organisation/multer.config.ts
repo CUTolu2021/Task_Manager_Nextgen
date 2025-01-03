@@ -1,12 +1,9 @@
 import * as multer from 'multer';
 
 export const multerConfig = {
-  storage: multer.diskStorage({
-    destination: './uploads', // Upload files to this directory
-    filename: (req, file, cb) => {
-      cb(null, file.originalname); // Use the original file name
-    },
-  }),
+  storage: multer.memoryStorage(
+    
+  ),
   limits: {
     fileSize: 1024 * 1024 * 5, // 5MB file size limit
   },
@@ -18,3 +15,4 @@ export const multerConfig = {
     cb(null, true);
   },
 };
+

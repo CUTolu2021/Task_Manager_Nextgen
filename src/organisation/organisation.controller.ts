@@ -12,11 +12,11 @@ import {
 } from '@nestjs/common';
 import { OrganisationService } from './organisation.service';
 import { UpdateOrganisationDto } from './dto/update-organisation.dto';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { RolesGuard } from 'src/auth/roles.guard';
+import { AuthGuard } from '../auth/auth.guard';
+import { RolesGuard } from '../auth/roles.guard';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { Roles } from 'src/auth/roles.decorator';
-import { Role } from 'src/auth/role.enum';
+import { Roles } from '../auth/roles.decorator';
+import { Role } from '../auth/role.enum';
 
 @UseGuards(AuthGuard)
 @Controller('organisation')
@@ -36,11 +36,9 @@ export class OrganisationController {
     @Param('id') id: string,
     @UploadedFile() file: Express.Multer.File,
   ) {
-    // Call the OrganisationService to handle the file upload
     return await this.organisationService.uploadFile(+id, file);
   }
 
-  //@UseGuards(SuperAdminGuard)
   @UseGuards(RolesGuard)
   @Get()
   @Roles(Role.SuperAdmin)
@@ -48,7 +46,6 @@ export class OrganisationController {
     return this.organisationService.findAll();
   }
 
-  //@UseGuards(SuperAdminGuard)
   @UseGuards(RolesGuard)
   @Get(':id')
   @Roles(Role.SuperAdmin)
@@ -56,7 +53,6 @@ export class OrganisationController {
     return this.organisationService.findOneById(+id);
   }
 
-  //@UseGuards(AdminGuard)
   @UseGuards(RolesGuard)
   @Patch(':id')
   @Roles(Role.Admin)
@@ -68,18 +64,15 @@ export class OrganisationController {
   }
 
   //I assume i can have another patch request in the future case i want to change the approve status to false.
-  //@UseGuards(SuperAdminGuard)
   @UseGuards(RolesGuard)
   @Patch(':id/approve')
   @Roles(Role.SuperAdmin)
   async approveOrganisation(
     @Param('id') id: string,
-    //@Body() approved: boolean,
   ) {
     return this.organisationService.approveOrganisation(+id, true);
   }
 
-  //@UseGuards(SuperAdminandAdminGuard)
   @UseGuards(RolesGuard)
   @Delete(':id')
   @Roles(Role.Admin, Role.SuperAdmin)

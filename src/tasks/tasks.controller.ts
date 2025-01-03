@@ -31,9 +31,14 @@ export class TasksController {
   }
 
   @Get()
-  findAll(@Query() paginationDto: PaginationDto, @GetUser() user: any) {
-    console.log(paginationDto.limit ,"and", paginationDto.skip);
-    return this.tasksService.findAll(paginationDto, user);
+  findAll(
+    @Query() paginationDto: PaginationDto,
+    @Query() filterDto: Record<string, any>,
+    @GetUser() user: any,
+  ) {
+    console.log(paginationDto.limit, 'and', paginationDto.skip);
+    //console.log('user is' + user);
+    return this.tasksService.findAll(paginationDto, user, filterDto);
   }
 
   @UseGuards(RolesGuard)

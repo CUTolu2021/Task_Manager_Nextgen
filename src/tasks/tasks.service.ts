@@ -81,8 +81,32 @@ export class TasksService {
     filterDto: Record<string, any>,
   ) {
     const loggedInUserId = user.id;
+    console.log(user.type);
     const loggedInUser = await this.usersService.findOne(loggedInUserId);
     const loggedInUserOrganisationId = loggedInUser.organisation?.id;
+
+    // Dynamic filter conditions
+    const filterWhere: any = {};
+
+    if (filterDto.taskName) {
+      filterWhere.taskName = filterDto.taskName;
+    }
+
+    if (filterDto.status) {
+      filterWhere.status = filterDto.status;
+    }
+
+    if (filterDto.assignedBy) {
+      filterWhere.assignedBy = { id: filterDto.assignedBy };
+    }
+
+    if (filterDto.assignedTo) {
+      filterWhere.assignedTo = { id: filterDto.assignedTo };
+    }
+
+    if (filterDto.dueDate) {
+      filterWhere.dueDate = filterDto.dueDate;
+    }
 
     if (user.type?.toLowerCase() === 'individual') {
       const tasks = await this.tasksRepository.find({
@@ -92,6 +116,7 @@ export class TasksService {
           assignedTo: {
             id: loggedInUserId,
           },
+          ...filterWhere,
         },
       });
       return tasks;
@@ -103,6 +128,7 @@ export class TasksService {
         organisation: {
           id: loggedInUserOrganisationId,
         },
+        ...filterWhere,
       },
       relations: ['assignedBy', 'assignedTo', 'comments'],
     });

@@ -12,7 +12,7 @@ export class OrganisationService {
   constructor(
     @InjectRepository(Organisation)
     private readonly organisationRepository: Repository<Organisation>,
-  ) {}
+  ) { }
   async create(createOrganisationDto: CreateOrganisationDto) {
     const organisation = await this.organisationRepository.save(
       createOrganisationDto,
@@ -21,11 +21,12 @@ export class OrganisationService {
   }
 
   async uploadFile(id: number, file: Express.Multer.File) {
+    //A check is ment to be here to make sure the admin is part of the organisation
     const organisation = await this.organisationRepository.findOneBy({ id });
     if (!organisation) {
       throw new HttpException('Organisation not found', HttpStatus.NOT_FOUND);
     }
-    const url = await uploadCAC( file.buffer, organisation.name + "_CAC_" + Date.now() );
+    const url = await uploadCAC(file.buffer, organisation.name + "_CAC_" + Date.now());
     organisation.CAC = url;
     const newUpload = await this.organisationRepository.save(organisation);
     return { message: 'File uploaded successfully', path: newUpload.CAC };
@@ -54,24 +55,24 @@ export class OrganisationService {
 
   async update(id: number, updateOrganisationDto: UpdateOrganisationDto, @GetUser() user: any) {
     try {
-    const loggedInUserId = user.id;
-    const organisation = await this.organisationRepository.findOneBy({ id, users: { id: loggedInUserId } });
-    console.log(organisation);
+      const loggedInUserId = user.id;
+      const organisation = await this.organisationRepository.findOneBy({ id, users: { id: loggedInUserId } });
+      console.log(organisation);
 
-    if (organisation === null) {
-      throw new HttpException(
-        'You are not authorized to update this organisation',
-        HttpStatus.UNAUTHORIZED,
-      );
+      if (organisation === null) {
+        throw new HttpException(
+          'You are not authorized to update this organisation',
+          HttpStatus.UNAUTHORIZED,
+        );
+      }
+      return await this.organisationRepository.update(id, updateOrganisationDto);
     }
-    return await this.organisationRepository.update(id, updateOrganisationDto);
-  }
-  catch (error) {
-    if (error) {
-      console.error('Error finding organisation:', error);
-      throw new NotFoundException('Failed to find organisation. Please check the organisation ID.');
+    catch (error) {
+      if (error) {
+        console.error('Error finding organisation:', error);
+        throw new NotFoundException('Failed to find organisation. Please check the organisation ID.');
+      }
     }
-  }
   }
 
   async approveOrganisation(id: number, approved: boolean) {
@@ -81,6 +82,7 @@ export class OrganisationService {
   }
 
   async remove(id: number) {
+    //A check is ment to be here to make sure the admin is part of the organisation
     const organisation = await this.organisationRepository.findOneBy({ id });
     organisation.status = 'inactive';
     await this.organisationRepository.save(organisation);

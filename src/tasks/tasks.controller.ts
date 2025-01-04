@@ -59,7 +59,7 @@ export class TasksController {
 
   @UseGuards(RolesGuard)
   @Delete(':id')
-  @Roles(Role.User, Role.Admin)
+  @Roles(Role.Admin)
   remove(@Param('id') id: string, @GetUser() user: any) {
     return this.tasksService.remove(+id, user);
   }

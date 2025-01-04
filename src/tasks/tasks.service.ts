@@ -154,14 +154,22 @@ export class TasksService {
     if (task.organisation.id !== loggedInUserOrganisationId) {
       throw new NotFoundException('Task not found');
     }
+    if (task.deleted === deleted.YES) {
+      throw new NotFoundException('Task not found');
+    }
     return task;
   }
 
   async update(id: number, updateTaskDto: UpdateTaskDto, @GetUser() user: any) {
     //The people who can update are admin of the organisation, or the user who assigned the task. Think about the personal users too
     const loggedInUserId = user.id;
-    let Mytask = await this.tasksRepository.findOne({ where: { id },
-      relations: ['assignedBy', 'assignedTo'], });
+    let Mytask = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['assignedBy', 'assignedTo'],
+    });
+    if (Mytask.deleted === deleted.YES) {
+      throw new NotFoundException('Task has been deleted found');
+    }
     if (Mytask.assignedBy.id !== loggedInUserId) {
       throw new NotFoundException('You are not authorized to update this task');
     }
@@ -190,15 +198,16 @@ export class TasksService {
   }
 
   async remove(id: number, @GetUser() user: any) {
-    const task = await this.tasksRepository.findOne({ where: { id },
-      relations: ['assignedBy', 'assignedTo'], });
+    const task = await this.tasksRepository.findOne({
+      where: { id },
+      relations: ['assignedBy', 'assignedTo'],
+    });
     if (!task) {
       throw new NotFoundException('Task not found');
     }
-    console.log(task);
     const loggedInUserId = user.id;
     if (task.assignedBy.id !== loggedInUserId) {
-      throw new NotFoundException('Task not found');//Reason for errors like this is to show multitenancy
+      throw new NotFoundException('Task not found'); //Reason for errors like this is to show multitenancy
     }
     task.deleted = deleted.YES;
     await this.tasksRepository.save(task);

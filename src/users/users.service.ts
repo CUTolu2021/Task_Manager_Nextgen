@@ -48,7 +48,6 @@ export class UsersService {
           name: userData.organisationName,
           CAC: userData.organisationCAC,
         });
-        console.log("new",organisation);
 
       }
     } else if (type === 'organisation' && userData.role === 'user') {
@@ -122,21 +121,31 @@ export class UsersService {
   } */
 
   async findUsersByLoggedInAdmin(paginationDto: PaginationDto,@GetUser() user: any) {
-    const loggedInUserId = user.id;
-    const loggedInUser = await this.userRepository.findOne({
-      where: { id: loggedInUserId },
-      relations: ['organisation'],
+    console.log(user);
+    if(user.role === 'admin'){
+      const loggedInUserId = user.id;
+      const loggedInUser = await this.userRepository.findOne({
+        where: { id: loggedInUserId },
+        relations: ['organisation'],
+      });
+      const users = await this.userRepository.find({
+        skip: paginationDto.skip,
+        take: paginationDto.limit || 5,
+        where: { organisation: { id: loggedInUser.organisation?.id } },
+      });
+      if (!users) {
+        throw new HttpException('No users found', HttpStatus.NOT_FOUND);
+      }
+      return users;
+  }
+  else if (user.role === 'super-admin') {
+    return await this.userRepository.find({});
+  }
+  else {
+    return await this.userRepository.find({
+      where: { id: user.id },
     });
-    const users = await this.userRepository.find({
-      skip: paginationDto.skip,
-      take: paginationDto.limit || 5,
-      where: { organisation: { id: loggedInUser.organisation?.id } },
-    });
-    if (!users) {
-      throw new HttpException('No users found', HttpStatus.NOT_FOUND);
-    }
-
-    return users;
+  }
   }
 
   async findOneByNameOrEmail(nameOrEmail: string, @GetUser() user: any) {
@@ -159,12 +168,14 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    //A check is ment to be here 
     const updatedUser = await this.userRepository.update(id, updateUserDto);
     console.log(updatedUser);
     return updatedUser;
   }
 
   async remove(id: number) {
+    //A check is ment to be here 
     const User = await this.userRepository.findOneBy({ id });
     if (!User) {
       throw new NotFoundException('User not found');

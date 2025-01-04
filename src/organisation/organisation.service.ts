@@ -26,7 +26,9 @@ export class OrganisationService {
     if (!organisation) {
       throw new HttpException('Organisation not found', HttpStatus.NOT_FOUND);
     }
+    if(organisation.status !== 'active') throw new HttpException('Organisation is not active', HttpStatus.BAD_REQUEST);
     const url = await uploadCAC(file.buffer, organisation.name + "_CAC_" + Date.now());
+    console.log(url);
     organisation.CAC = url;
     const newUpload = await this.organisationRepository.save(organisation);
     return { message: 'File uploaded successfully', path: newUpload.CAC };
@@ -57,14 +59,14 @@ export class OrganisationService {
     try {
       const loggedInUserId = user.id;
       const organisation = await this.organisationRepository.findOneBy({ id, users: { id: loggedInUserId } });
-      console.log(organisation);
-
+      
       if (organisation === null) {
         throw new HttpException(
           'You are not authorized to update this organisation',
           HttpStatus.UNAUTHORIZED,
         );
       }
+      if(organisation.status !== 'active') throw new HttpException('Organisation is not active', HttpStatus.BAD_REQUEST);
       return await this.organisationRepository.update(id, updateOrganisationDto);
     }
     catch (error) {
@@ -77,6 +79,7 @@ export class OrganisationService {
 
   async approveOrganisation(id: number, approved: boolean) {
     const organisation = await this.organisationRepository.findOneBy({ id });
+    if(organisation.status !== 'active') throw new HttpException('Organisation is not active', HttpStatus.BAD_REQUEST);
     organisation.approved = approved;
     return this.organisationRepository.save(organisation);
   }

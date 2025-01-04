@@ -122,11 +122,10 @@ export class UsersService {
   } */
 
   async findUsersByLoggedInAdmin(paginationDto: PaginationDto,@GetUser() user: any) {
-    console.log(user);
     if(user.role === 'admin'){
       const loggedInUserId = user.id;
       const loggedInUser = await this.userRepository.findOne({
-        where: { id: loggedInUserId },
+        where: { id: loggedInUserId, status: 'active' },
         relations: ['organisation'],
       });
       const users = await this.userRepository.find({
@@ -144,7 +143,7 @@ export class UsersService {
   }
   else {
     return await this.userRepository.find({
-      where: { id: user.id },
+      where: { id: user.id, status: 'active' },
     });
   }
   }
@@ -169,6 +168,10 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
+    const user = await this.userRepository.findOneBy({ id });
+    if(user.status === 'inactive'){
+      throw new HttpException('User has been deleted', HttpStatus.BAD_REQUEST);
+    }
     //A check is ment to be here 
     const { password } = updateUserDto;
     const hashedPassword = await bcrypt.hash(password, 10);

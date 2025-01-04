@@ -116,8 +116,24 @@ export class TasksService {
           assignedTo: {
             id: loggedInUserId,
           },
+          deleted: deleted.NO,
           ...filterWhere,
         },
+      });
+      return tasks;
+    }
+    else if (user.type?.toLowerCase() === 'organisation' && user.role?.toLowerCase() === 'user') {
+      const tasks = await this.tasksRepository.find({
+        skip: paginationDto.skip,
+        take: paginationDto.limit || 5,
+        where: {
+          assignedTo: {
+            id: loggedInUserId,
+          },
+          deleted: deleted.NO,
+          ...filterWhere,
+        },
+        relations: ['comments'],
       });
       return tasks;
     }
@@ -128,6 +144,7 @@ export class TasksService {
         organisation: {
           id: loggedInUserOrganisationId,
         },
+        deleted: deleted.NO,
         ...filterWhere,
       },
       relations: ['assignedBy', 'assignedTo', 'comments'],
@@ -137,7 +154,7 @@ export class TasksService {
 
   async findOne(id: number) {
     const task = await this.tasksRepository.findOne({
-      where: { id },
+      where: { id, deleted: deleted.NO },
       relations: ['assignedBy', 'assignedTo', 'comments', 'organisation'],
     });
     return task;
@@ -168,19 +185,21 @@ export class TasksService {
       relations: ['assignedBy', 'assignedTo'],
     });
     if (Mytask.deleted === deleted.YES) {
-      throw new NotFoundException('Task has been deleted found');
+      throw new NotFoundException('Task has been deleted');
     }
-    if (Mytask.assignedBy.id !== loggedInUserId) {
+    if (Mytask.assignedBy.id === loggedInUserId || Mytask.assignedTo.id === loggedInUserId) {
+      if (user.role === Role.User && user.type === 'organisation') {
+        //if a user should update a task he is most likely wanting to mark it as completed
+        Mytask.status = taskStatus.COMPLETED;
+        await this.tasksRepository.save(Mytask);
+      } else {
+        await this.tasksRepository.update(id, updateTaskDto);
+      }
+    }
+    else {
       throw new NotFoundException('You are not authorized to update this task');
     }
-    if (user.role === Role.User && user.type === 'organisation') {
-      //if a user should update a task he is most likely wanting to mark it as completed
-      Mytask.status = taskStatus.COMPLETED;
-      await this.tasksRepository.save(Mytask);
-    } else {
-      await this.tasksRepository.update(id, updateTaskDto);
-    }
-
+    
     const createHistoryDto = new CreateHistoryDto();
     if (
       updateTaskDto.status === taskStatus.COMPLETED ||

@@ -91,7 +91,7 @@ export class CommentsService {
     catch (error) {
       if (error) {
         console.error('Error saving comment:', error);
-        throw new NotFoundException('Failed to save comment. Please check the comment ID. comment was not found.');
+        throw new NotFoundException('Failed to save comment.');
       }
       else {
         throw error;

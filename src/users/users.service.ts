@@ -13,6 +13,7 @@ import { Organisation } from '../organisation/entities/organisation.entity';
 import { OrganisationService } from '../organisation/organisation.service';
 import { GetUser } from '../decorator/getUserDecorator';
 import { PaginationDto } from '../pagination.dto';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class UsersService {
@@ -169,8 +170,10 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto) {
     //A check is ment to be here 
+    const { password } = updateUserDto;
+    const hashedPassword = await bcrypt.hash(password, 10);
+    updateUserDto.password = hashedPassword;
     const updatedUser = await this.userRepository.update(id, updateUserDto);
-    console.log(updatedUser);
     return updatedUser;
   }
 

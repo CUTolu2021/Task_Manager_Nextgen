@@ -1,39 +1,61 @@
+# Nextgen Task Management System
 
-Open First
-https://docs.google.com/document/d/1-i-eqx3qLrDinvXDK4HjpsopklbDuMHz1a2-UI3U23g/edit?usp=sharing
+Welcome to the Nextgen Task Management System! This project is designed to help you manage your tasks efficiently and effectively. Whether you are an individual or part of an organization, our system provides the tools you need to stay organized and productive.
+
+## Features
+
+- **Create and manage tasks**: Easily create tasks and manage them through their lifecycle.
+- **Assign tasks to team members**: Delegate tasks to team members and track their progress.
+- **Track task progress and status**: Monitor the status of tasks and ensure they are completed on time.
+- **Comment on tasks and collaborate with your team**: Communicate with your team members directly on tasks.
+- **Manage user roles and permissions**: Control access to different parts of the system based on user roles.
+- **View task history and activity logs**: Keep track of all changes and activities related to tasks.
+
+## Getting Started
+
+To get started with the Nextgen Task Management System, follow these steps:
+
+1. **Clone the repository**:
+    ```bash
+    git clone https://github.com/CUTolu2021/Task_Manager_Nextgen.git
+    cd nextgen-task-manager
+    ```
+
+2. **Install dependencies**:
+    ```bash
+    npm install
+    ```
+
+3. **Run the application**:
+    ```bash
+    npm run start
+    ```
+
+4. **Access the application**:
+    Open your web browser and navigate to `http://localhost:3000`.
+
+For detailed API documentation and usage instructions, please refer to our [Postman Documentation](https://documenter.getpostman.com/view/26562270/2sAYJ7hf2f).
+
+## Contributing
+
+We welcome contributions to the Nextgen Task Management System! If you would like to contribute, please follow these steps:
+
+1. Fork the repository.
+2. Create a new branch for your feature or bugfix.
+3. Make your changes and commit them with a descriptive message.
+4. Push your changes to your forked repository.
+5. Create a pull request to the main repository.
+
+## Contact Us
+
+If you have any questions or need support, please contact our support team at [Help](mailto:omoniyitolulope05@gmail.com).
 
 
 
 
 
 
-
-
-
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
+# Guide to use Nest and TypeScript (Default)
 ## Description
 
 [Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.

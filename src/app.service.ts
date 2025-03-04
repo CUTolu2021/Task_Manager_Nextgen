@@ -22,10 +22,6 @@ export class AppService {
       <p>
         To get started, please refer to our <a href="https://documenter.getpostman.com/view/26562270/2sAYJ7hf2f" target="_blank">Postman Documentation</a> for API details and usage instructions.
       </p>
-      <h2>Contact Us</h2>
-      <p>
-        If you have any questions or need support, please contact our support team at support@nextgentaskmanager.com.
-      </p>
     `;
   }
 }
